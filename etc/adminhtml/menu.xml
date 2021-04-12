@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add
+            id="Mageplaza_Affiliate::affiliate"
+            title="Affiliate"
+            module="Mageplaza_Affiliate"
+            sortOrder="10"
+            resource="Mageplaza_Affiliate::affiliate"
+        />
+        <add
+            id="Mageplaza_Affiliate::affiliate_mananger"
+            title="Manage Account"
+            module="Mageplaza_Affiliate"
+            sortOrder="1"
+            action="affiliate/account/index"
+            resource="Mageplaza_Affiliate::affiliate_mananger"
+            parent="Mageplaza_Affiliate::affiliate"
+        />
+        <add
+            id="Mageplaza_Affiliate::affiliate_history"
+            title="History"
+            module="Mageplaza_Affiliate"
+            sortOrder="2"
+            action="affiliate/history/index"
+            resource="Mageplaza_Affiliate::affiliate_history"
+            parent="Mageplaza_Affiliate::affiliate"
+        />
+        <add
+            id="Mageplaza_Affiliate::affiliate_configuration"
+            title="Configuration"
+            module="Mageplaza_Affiliate"
+            sortOrder="3"
+            parent="Mageplaza_Affiliate::affiliate"
+            action="adminhtml/system_config/edit/section/affiliate"
+            resource="Mageplaza_Affiliate::affiliate_configuration"
+        />
+    </menu>
+</config>
