@@ -20,15 +20,18 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
 
     protected function _prepareForm()
     {
+        $model = $this->_coreRegistry->registry('affiliate_form_data');
+//
         $form = $this->_formFactory->create();
         $account = $this->accountFactory->create();
         $id = $this->getRequest()->getParams('id');
-        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/test.log');
-        $logger = new \Zend\Log\Logger();
-        $logger->addWriter($writer);
-        $logger->info($account->getCollection()->load($id)->getData());
-
-
+//
+//        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/test.log');
+//        $logger = new \Zend\Log\Logger();
+//        $logger->addWriter($writer);
+//        $logger->info($model);
+//
+//
         $fieldset = $form->addFieldset('base_fieldset', ['legend' => __('Account Infomation')]);
         $fieldset->addField(
             'customer_id',
@@ -41,11 +44,13 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
         );
         $fieldset->addField(
             'status',
-            'select', [
-                'name'     => 'status',
-                'label'    => __('Status'),
-                'title'    => __('status'),
-                'required' => true
+            'select',
+            [
+                'label' => __('Status'),
+                'title' => __('Status'),
+                'name' => 'is_enabled',
+                'required' => true,
+                'options' => ['1' => ('Enabled'), '0' => ('Disabled')]
             ]
         );
         $fieldset->addField(
@@ -56,7 +61,7 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
                 'title'    => __('balance')
             ]
         );
-
+//
         $this->setForm($form);
         return parent::_prepareForm();
     }
