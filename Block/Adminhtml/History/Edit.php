@@ -34,6 +34,7 @@ class Edit extends \Magento\Backend\Block\Widget\Form\Container
             ],
             -100
         );
+
         $this->buttonList->update('delete', 'label', __('Delete'));
     }
 }

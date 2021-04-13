@@ -1,46 +1,19 @@
 <?php
-/**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
+namespace Mageplaza\Affiliate\Controller\Adminhtml\Account;
 
-/**
- * Created By : Rohan Hapani
- */
-namespace Mageplaza\GiftCard\Controller\Adminhtml\Code;
-use Magento\Backend\App\Action;
-use Magento\Backend\App\Action\Context;
-
-/**
- * Delete Controller
- */
 class Delete extends \Magento\Backend\App\Action
 {
-
-    /**
-     * @var \Mageplaza\GiftCard\Model\GiftCardFactory
-     */
-    protected $giftcardFactory;
-
-    /**
-     * @param Context                    $context
-     * @param \Mageplaza\GiftCard\Model\GiftCardFactory $giftcardFactory
-     */
     public function __construct(
-        Context $context,
-        \Mageplaza\GiftCard\Model\GiftCardFactory $giftcardFactory
+        \Magento\Backend\App\Action\Context $context,
+        \Mageplaza\Affiliate\Model\AccountFactory $accountFactory
     ) {
         parent::__construct($context);
-        $this->giftcardFactory = $giftcardFactory;
+        $this->accountFactory = $accountFactory;
     }
-
-    /**
-     * @return bool
-     */
-    protected function _isAllowed()
-    {
-        return $this->_authorization->isAllowed('Mageplaza_GiftCard::giftcard');
-    }
+//    protected function _isAllowed()
+//    {
+//        return $this->_authorization->isAllowed('Mageplaza_GiftCard::giftcard');
+//    }
 
     /**
      * @return \Magento\Backend\Model\View\Result\Redirect
@@ -54,10 +27,10 @@ class Delete extends \Magento\Backend\App\Action
         if($ids){
             foreach ($ids as $id){
                 try {
-                    $model = $this->giftcardFactory->create();
+                    $model = $this->accountFactory->create();
                     $model->load($id);
                     $model->delete();
-                    $this->messageManager->addSuccess(__('The post has been deleted.'));
+                    $this->messageManager->addSuccess(__('The account has been deleted.'));
                 } catch (\Exception $e) {
                     $this->messageManager->addError($e->getMessage());
                     return $resultRedirect->setPath('*/*/index', ['id' => $id]);
@@ -68,7 +41,7 @@ class Delete extends \Magento\Backend\App\Action
 
         if ($id) {
             try {
-                $model = $this->giftcardFactory->create();
+                $model = $this->accountFactory->create();
                 $model->load($id);
                 $model->delete();
                 $this->messageManager->addSuccess(__('The post has been deleted.'));
