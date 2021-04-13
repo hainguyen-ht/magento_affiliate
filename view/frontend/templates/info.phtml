@@ -1,33 +1,82 @@
 <?php
-/** @var \Mageplaza\GiftCard\Block\GiftCard\Info $block */
+/** @var \Mageplaza\Affiliate\Block\Affiliate\Info $block */
 echo $block->getLayout()->createBlock(\Magento\Cms\Block\Block::class)->setBlockId('block_identifier')->toHtml(); ?>
 <?php
 $id = $block->getCustomerID();
-$aff = $block->getModelAccountAff();
-//echo "<pre>";
-//print_r($id->load(2, 'customer_id')->getData());
-//echo "</pre>";
-//die();
-?>
+$data = $block->getModelAccountAff()->load($id, 'customer_id')->getData();
 
-<div class="block block-dashboard-info">
-    <div class="block-title"><strong><?= $block->escapeHtml(__('Affiliate Information')) ?></strong></div>
-    <div class="block-content">
-        <div class="box box-information">
-            <strong class="box-title">
-                <span><?= $block->escapeHtml(__('Balance')) ?></span>
-            </strong>
-            <div class="box-content">
-                <?= '$666' ?>
+?>
+<?php
+    if($data){
+        $history = $block->getModelHistory()->getCollection()->getData();
+        $array = array();
+        foreach ($history as $item){
+            if($item['customer_id'] == $id){
+                $array[] = $item;
+            }
+        }
+?>
+<div>
+    <div class="block block-dashboard-info">
+        <div class="block-title"><strong><?= $block->escapeHtml(__('Affiliate Information')) ?></strong></div>
+        <div class="block-content">
+            <div class="box box-information">
+                <strong class="box-title">
+                    <span><?= $block->escapeHtml(__('Balance')) ?></span>
+                </strong>
+                <div class="box-content">
+                    <?= '$'.$data['balance'] ?>
+                </div>
             </div>
-        </div>
-        <div class="box box-newsletter">
-            <strong class="box-title">
-                <span><?= $block->escapeHtml(__('Refer Link:')) ?></span>
-            </strong>
-            <div class="box-content">
-                http://localhost.com/affiliate/refer/index/key/abcd12
+            <div class="box box-newsletter">
+                <strong class="box-title">
+                    <span><?= $block->escapeHtml(__('Refer Link:')) ?></span>
+                </strong>
+                <div class="box-content">
+                    <?= strtolower($block->referLink().$data['code']) ?>
+                </div>
             </div>
         </div>
     </div>
+    <div class="block block-dashboard-info">
+        <div class="block-title"><strong><?= $block->escapeHtml(__('History')) ?></strong></div>
+        <div class="table-wrapper orders-history">
+            <table class="data table table-order-items history" id="my-orders-table">
+                <thead>
+                <tr>
+                    <th scope="col" class="col date"><?= $block->escapeHtml(__('Date')) ?></th>
+                    <th scope="col" class="col shipping"><?= $block->escapeHtml(__('code')) ?></th>
+                    <th scope="col" class="col total"><?= $block->escapeHtml(__('Amount')) ?></th>
+                    <th scope="col" class="col actions"><?= $block->escapeHtml(__('Action')) ?></th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php
+                    foreach ($array as $item){
+
+                ?>
+                <tr>
+                    <td class="col id"><?= $item['amount'] ?></td>
+                    <td class="col id"><?= $item['order_id'] ?></td>
+                    <td class="col id"><?= $item['status'] ?></td>
+                    <td class="col id"><?= $item['created_at'] ?></td>
+                </tr>
+                <?php } ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+<?php
+    }else
+        {
+?>
+    <div>
+        <form action=<?= $block->getFormAction() ?> method="post">
+            <button name="register">Register</button>
+        </form>
+    </div>
+<?php
+    }
+?>
+

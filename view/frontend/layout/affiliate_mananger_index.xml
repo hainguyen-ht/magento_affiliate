@@ -9,8 +9,6 @@
         <referenceContainer name="content">
             <block class="Mageplaza\Affiliate\Block\Affiliate\Info" name="affiliate_info" template="Mageplaza_Affiliate::info.phtml" cacheable="false">
             </block>
-            <block class="Mageplaza\Affiliate\Block\Affiliate\History" name="affiliate_history" template="Mageplaza_Affiliate::history.phtml">
-            </block>
         </referenceContainer>
     </body>
 </page>
