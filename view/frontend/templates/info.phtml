@@ -1,0 +1,33 @@
+<?php
+/** @var \Mageplaza\GiftCard\Block\GiftCard\Info $block */
+echo $block->getLayout()->createBlock(\Magento\Cms\Block\Block::class)->setBlockId('block_identifier')->toHtml(); ?>
+<?php
+$id = $block->getCustomerID();
+$aff = $block->getModelAccountAff();
+//echo "<pre>";
+//print_r($id->load(2, 'customer_id')->getData());
+//echo "</pre>";
+//die();
+?>
+
+<div class="block block-dashboard-info">
+    <div class="block-title"><strong><?= $block->escapeHtml(__('Affiliate Information')) ?></strong></div>
+    <div class="block-content">
+        <div class="box box-information">
+            <strong class="box-title">
+                <span><?= $block->escapeHtml(__('Balance')) ?></span>
+            </strong>
+            <div class="box-content">
+                <?= '$666' ?>
+            </div>
+        </div>
+        <div class="box box-newsletter">
+            <strong class="box-title">
+                <span><?= $block->escapeHtml(__('Refer Link:')) ?></span>
+            </strong>
+            <div class="box-content">
+                http://localhost.com/affiliate/refer/index/key/abcd12
+            </div>
+        </div>
+    </div>
+</div>
