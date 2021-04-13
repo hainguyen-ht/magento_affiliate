@@ -24,10 +24,12 @@ class Save extends \Magento\Backend\App\Action
         Action\Context $context,
         \Magento\Backend\Model\Auth\Session $adminSession,
         \Mageplaza\Affiliate\Model\AccountFactory $accountFactory,
+        \Mageplaza\Affiliate\Model\HistoryFactory $historyFactory,
         array $data = []
     ) {
         $this->_adminSession = $adminSession;
         $this->accountFactory = $accountFactory;
+        $this->historyFactory = $historyFactory;
         parent::__construct($context);
     }
 
@@ -56,6 +58,7 @@ class Save extends \Magento\Backend\App\Action
         $resultRedirect = $this->resultRedirectFactory->create();
         if ($data) {
             $account = $this->accountFactory->create();
+            $history = $this->historyFactory->create();
             $id = $postObj['account_id'] ?? null;
             if ($id) {
                // edit Account
@@ -63,12 +66,22 @@ class Save extends \Magento\Backend\App\Action
                     $this->messageManager->addWarning(__('Account not found!'));
                     return $resultRedirect->setPath('*/*/');
                 }
-                $account->addData(
+                $editAccount = $account->addData(
                     [
                         'status' => $data['status'],
                         'balance'=> $data['balance']
                     ]
                 )->save();
+                if($editAccount){
+                    $history->addData([
+                        'order_id'     => 1,
+                        'order_increment_id' => 1,
+                        'customer_id' =>$data['customer_id'],
+                        'is_admin_change' => 1,
+                        'amount' => $data['balance'],
+                        'status' => $data['status']
+                    ])->save();
+                }
                 $this->messageManager->addSuccess(__('The data has been saved.'));
                 $this->_adminSession->setFormData(false);
                 if ($this->getRequest()->getParam('back')) {
@@ -78,15 +91,25 @@ class Save extends \Magento\Backend\App\Action
             } else {
                 //CREATE Account
                 //auto generate code => code
-                    $code = $this->random($postObj['code_length']);
-                $account->addData([
+                $code = $this->random($postObj['code_length']);
+                $addAccount = $account->addData([
                         'customer_id' => $data['customer_id'],
                         'code'        => strtolower($code),
                         'balance'     => $data['balance'],
                         'status'      => $data['status']
                     ])->save();
-                    $this->messageManager->addSuccess(__('The data has been saved.'));
-                    return $resultRedirect->setPath('*/*/');
+                if($addAccount){
+                    $history->addData([
+                        'order_id'     => 1,
+                        'order_increment_id' => 1,
+                        'customer_id' =>$data['customer_id'],
+                        'is_admin_change' => 1,
+                        'amount' => $data['balance'],
+                        'status' => $data['status']
+                    ])->save();
+                }
+                $this->messageManager->addSuccess(__('The data has been saved.'));
+                return $resultRedirect->setPath('*/*/');
             }
             $this->_getSession()->setFormData($data);
             return $resultRedirect->setPath('*/*/edit', ['id' => $this->getRequest()->getParam('id')]);

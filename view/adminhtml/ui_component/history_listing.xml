@@ -134,9 +134,11 @@
         <!--Status-->
         <column name="status">
             <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Mageplaza\Affiliate\Ui\Component\Listing\Column\Status</item>
                 <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/select</item>
                     <item name="visible" xsi:type="boolean">true</item>
-                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="dataType" xsi:type="string">select</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="dataScope" xsi:type="string">status</item>
                     <item name="label" xsi:type="string" translate="true">Status</item>
