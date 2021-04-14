@@ -37,15 +37,11 @@ class Info extends \Magento\Framework\View\Element\Template
         return $this->historyFactory->create();
     }
     public function referLink(){
-        $urlRefer = 'http://localhost.com/affiliate/refer/index/';
+        $urlRefer = 'http://localhost.com/magento/affiliate/refer/index/';
         $key = $this->scopeConfig->getValue('affiliate/general/url_key',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-        return $urlRefer = $urlRefer . $key . '/';
+        return $urlRefer . $key . '/';
     }
-//    public function isEnableConfig(){
-//        return $this->scopeConfig->getValue('giftcard/general/enable_giftcard',
-//            \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-//    }
     public function getFormAction()
     {
         return $this->getUrl('affiliate/mananger/register');

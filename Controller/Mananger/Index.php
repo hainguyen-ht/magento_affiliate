@@ -18,7 +18,7 @@ class Index extends \Magento\Framework\App\Action\Action {
         parent::__construct($context);
     }
     public function getCustomerID(){
-        return $this->customer->getCustomer()->getId();
+        return $this->customer->getCustomerId();
     }
     public function redirect(){
         return $this->redirect->redirect($this->response, 'customer/account/login');

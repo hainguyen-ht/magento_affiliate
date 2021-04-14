@@ -43,8 +43,9 @@
                         <field id="affiliate/affiliate_rule/apply_discount_to_customer" separator="|">fixed|percentage</field>
                     </depends>
                 </field>
-                <field id="commission_type" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="commission_type" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Commission Type</label>
+                    <source_model>Mageplaza\Affiliate\Model\Config\Source\SelectCommissionType</source_model>
                     <comment>(Fixed Value, Percentage of order total)</comment>
                 </field>
                 <field id="commission_value" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
