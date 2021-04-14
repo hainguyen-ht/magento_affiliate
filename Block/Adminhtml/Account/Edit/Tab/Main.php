@@ -27,6 +27,16 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
         $form = $this->_formFactory->create();
         $form->setHtmlIdPrefix('page_');
         $fieldset = $form->addFieldset('base_fieldset', ['legend' => __('Account Infomation')]);
+        $fieldset->addField(
+            'customer_id',
+            $model->getID() ? 'label' : 'text', [
+                'name'     => 'customer_id',
+                'label'    => __('Customer ID'),
+                'title'    => __('customer_id'),
+                'required' => !$model->getID() ? true : false
+            ]
+        );
+
         if($model->getID())
         {
             $fieldset->addField(
@@ -37,14 +47,6 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
                     'label' => __('ID'),
                     'title' => __('ID'),
                     'disabled' => false,
-                ]
-            );
-            $fieldset->addField(
-                'customer_id',
-                'label', [
-                    'name'     => 'customer_id',
-                    'label'    => __('Customer ID'),
-                    'title'    => __('customer_id'),
                 ]
             );
             $fieldset->addField(
@@ -71,20 +73,7 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
         {
             $codeLength = $this->scopeConfig->getValue('affiliate/general/code_length',
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-//            $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/test.log');
-//            $logger = new \Zend\Log\Logger();
-//            $logger->addWriter($writer);
-//            $logger->info($model);
-//            die();
-            $fieldset->addField(
-                'customer_id',
-                'text', [
-                    'name'     => 'customer_id',
-                    'label'    => __('Customer ID'),
-                    'title'    => __('customer_id'),
-                    'required' => true
-                ]
-            );
+
             $fieldset->addField(
                 'code_length',
                 'hidden', [

@@ -51,10 +51,6 @@ class Save extends \Magento\Backend\App\Action
         $username = $this->_adminSession->getUser()->getFirstname();
         $userDetail = ["name" => $username, "created_at" => $date];
         $data = array_merge($postObj, $userDetail);
-//        echo "<pre>";
-//        print_r($data);
-//        echo "</pre>";
-//        die();
         $resultRedirect = $this->resultRedirectFactory->create();
         if ($data) {
             $account = $this->accountFactory->create();
@@ -66,20 +62,21 @@ class Save extends \Magento\Backend\App\Action
                     $this->messageManager->addWarning(__('Account not found!'));
                     return $resultRedirect->setPath('*/*/');
                 }
+
                 $editAccount = $account->addData(
                     [
                         'status' => $data['status'],
                         'balance'=> $data['balance']
                     ]
                 )->save();
-                if($editAccount){
+                if($data['balance'] > 0){
                     $history->addData([
-                        'order_id'     => 1,
-                        'order_increment_id' => 1,
-                        'customer_id' =>$data['customer_id'],
-                        'is_admin_change' => 1,
-                        'amount' => $data['balance'],
-                        'status' => $data['status']
+                        'order_id'              => 1,
+                        'order_increment_id'    => 1,
+                        'customer_id'           => $account->load($id)->getData('customer_id'),
+                        'is_admin_change'       => 1,
+                        'amount'                => $data['balance'],
+                        'status'                => $data['status']
                     ])->save();
                 }
                 $this->messageManager->addSuccess(__('The data has been saved.'));
@@ -98,7 +95,7 @@ class Save extends \Magento\Backend\App\Action
                         'balance'     => $data['balance'],
                         'status'      => $data['status']
                     ])->save();
-                if($addAccount){
+                if($data['balance'] > 0){
                     $history->addData([
                         'order_id'     => 1,
                         'order_increment_id' => 1,
