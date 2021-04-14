@@ -13,6 +13,10 @@ class Index extends \Magento\Framework\App\Action\Action
     }
 
     public function execute(){
+        echo "<pre>";
+        print_r($_COOKIE);
+        echo "</pre>";
+        die();
 
         $data = $this->accountFactory->create();
         foreach ($data->getCollection() as $item) {

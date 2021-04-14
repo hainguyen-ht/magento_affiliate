@@ -37,7 +37,7 @@ class Info extends \Magento\Framework\View\Element\Template
         return $this->historyFactory->create();
     }
     public function referLink(){
-        $urlRefer = 'http://localhost.com/magento/affiliate/refer/index/';
+        $urlRefer = '127.0.0.1/magento/affiliate/refer/index/';
         $key = $this->scopeConfig->getValue('affiliate/general/url_key',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         return $urlRefer . $key . '/';

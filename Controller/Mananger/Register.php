@@ -6,12 +6,16 @@ class Register extends \Magento\Framework\App\Action\Action{
         \Magento\Customer\Model\Session $customerSession,
         \Mageplaza\Affiliate\Model\AccountFactory $accountFactory,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Framework\App\Response\Http $response,
+        \Magento\Framework\App\Response\RedirectInterface $redirect,
         \Magento\Framework\App\Action\Context $context
     )
     {
         $this->customerSession = $customerSession;
         $this->accountFactory = $accountFactory;
         $this->scopeConfig = $scopeConfig;
+        $this->response = $response;
+        $this->redirect = $redirect;
         parent::__construct($context);
     }
     public function getCustomerID(){
@@ -25,6 +29,9 @@ class Register extends \Magento\Framework\App\Action\Action{
             $oString .= $charS;
         }
         return $oString;
+    }
+    public function redirect(){
+        return $this->redirect->redirect($this->response, 'customer/account/login');
     }
     public function execute()
     {
