@@ -42,15 +42,14 @@ class Discount extends \Magento\Quote\Model\Quote\Address\Total\AbstractTotal
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\SalesRule\Model\Validator $validator,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
-        \Mageplaza\GiftCard\Model\GiftCardFactory $giftcardFactory,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Checkout\Model\Session $checkoutSession
     ) {
-        $this->setCode('testdiscount');
         $this->eventManager = $eventManager;
         $this->calculator = $validator;
         $this->storeManager = $storeManager;
         $this->priceCurrency = $priceCurrency;
-        $this->giftcardFactory = $giftcardFactory;
+        $this->scopeConfig = $scopeConfig;
         $this->checkoutSession = $checkoutSession;
     }
 
@@ -70,37 +69,38 @@ class Discount extends \Magento\Quote\Model\Quote\Address\Total\AbstractTotal
     )
     {
         parent::collect($quote, $shippingAssignment, $total);
-
-
-        $amount = 50;
-
-        if(($total->getData()['subtotal'] - $amount) <= 0){
-            $amount = $total->getData()['subtotal'];
+        //tinh toan
+        $typeApply = $this->scopeConfig->getValue('affiliate/affiliate_rule/apply_discount_to_customer',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $discountValue = $this->scopeConfig->getValue('affiliate/affiliate_rule/discount_value',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $key = $this->scopeConfig->getValue('affiliate/general/url_key',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        //Check refer
+        if(isset($_COOKIE[$key])){
+            switch ($typeApply){
+                case 'fixed':
+                    $amount = $discountValue;
+                    break;
+                case 'percentage':
+                    $amount = $total->getData()['subtotal'] * ($discountValue / 100) ;
+                    break;
+                default:
+                    $amount = 0;
+            }
+        }else {
+            $amount = 0;
         }
-        $address = $shippingAssignment->getShipping()->getAddress();
-        $label = 'Gift Card';
-        $discountAmount = 0 - $amount;
-        $appliedCartDiscount = 0;
-        if ($total->getDiscountDescription()) {
-            // If a discount exists in cart and another discount is applied, the add both discounts.
-            $appliedCartDiscount = $total->getDiscountAmount();
-            $discountAmount = $total->getDiscountAmount() + $discountAmount;
-            $label = $total->getDiscountDescription() . ', ' . $label;
+        // set title
+        $total->setDiscountDescription('Discount');
+        // set amount
+        $amount = 0- $amount;
+        if(($total->getData()['subtotal'] + $amount) <= 0){
+            $amount = 0 - $total->getData()['subtotal'];
         }
-//            print_r($total->getData()['subtotal']);
 
-        $total->setDiscountDescription($label);
-        $total->setDiscountAmount($discountAmount);
-        $total->setBaseDiscountAmount($discountAmount);
-        $total->setSubtotalWithDiscount($total->getSubtotal() + $discountAmount);
-        $total->setBaseSubtotalWithDiscount($total->getBaseSubtotal() + $discountAmount);
-        if (isset($appliedCartDiscount)) {
-            $total->addTotalAmount($this->getCode(), $discountAmount - $appliedCartDiscount);
-            $total->addBaseTotalAmount($this->getCode(), $discountAmount - $appliedCartDiscount);
-        } else {
-            $total->addTotalAmount($this->getCode(), $discountAmount);
-            $total->addBaseTotalAmount($this->getCode(), $discountAmount);
-        }
+        $total->addTotalAmount($this->getCode(), $amount);
+
         return $this;
 
     }
@@ -113,6 +113,8 @@ class Discount extends \Magento\Quote\Model\Quote\Address\Total\AbstractTotal
      */
     public function fetch(\Magento\Quote\Model\Quote $quote, \Magento\Quote\Model\Quote\Address\Total $total)
     {
+
+        // hien thi
         $result = null;
         $amount = $total->getDiscountAmount();
 
@@ -123,7 +125,7 @@ class Discount extends \Magento\Quote\Model\Quote\Address\Total\AbstractTotal
             $description = $total->getDiscountDescription();
             $result = [
                 'code' => $this->getCode(),
-                'title' => strlen($description) ? __('Discount (%1)', $description) : __('Discount'),
+                'title' => __($description),
                 'value' => $amount
             ];
         }

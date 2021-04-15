@@ -44,21 +44,22 @@ $data = $block->getModelAccountAff()->load($id, 'customer_id')->getData();
             <table class="data table table-order-items history" id="my-orders-table">
                 <thead>
                 <tr>
-                    <th scope="col" class="col date"><?= $block->escapeHtml(__('Date')) ?></th>
-                    <th scope="col" class="col shipping"><?= $block->escapeHtml(__('code')) ?></th>
-                    <th scope="col" class="col total"><?= $block->escapeHtml(__('Amount')) ?></th>
-                    <th scope="col" class="col actions"><?= $block->escapeHtml(__('Action')) ?></th>
+                    <th scope="col" class="col "><?= $block->escapeHtml(__('Order ID')) ?></th>
+                    <th scope="col" class="col "><?= $block->escapeHtml(__('Order Increment ID')) ?></th>
+                    <th scope="col" class="col "><?= $block->escapeHtml(__('is Admin Change')) ?></th>
+                    <th scope="col" class="col "><?= $block->escapeHtml(__('Amount')) ?></th>
+                    <th scope="col" class="col "><?= $block->escapeHtml(__('Date')) ?></th>
                 </tr>
                 </thead>
                 <tbody>
                 <?php
                     foreach ($array as $item){
-
                 ?>
                 <tr>
-                    <td class="col id"><?= $item['amount'] ?></td>
                     <td class="col id"><?= $item['order_id'] ?></td>
-                    <td class="col id"><?= $item['status'] ?></td>
+                    <td class="col id"><?= $item['order_increment_id'] ?></td>
+                    <td class="col id"><?= ($item['is_admin_change'] == 1) ? 'Admin' : 'Customer Order' ?></td>
+                    <td class="col id"><?= $item['amount'] ?></td>
                     <td class="col id"><?= $item['created_at'] ?></td>
                 </tr>
                 <?php } ?>

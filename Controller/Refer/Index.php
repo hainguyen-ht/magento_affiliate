@@ -27,21 +27,24 @@ class Index extends \Magento\Framework\App\Action\Action
     }
     public function execute()
     {
+        $key = $this->scopeConfig->getValue('affiliate/general/url_key',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $code = $this->request->getParam($key);
         $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
         $customerID = $this->customerSession->getCustomerId();
-//check login
+
+        //check login
         if(!$customerID){
             return $this->redirect();
         }
         $account = $this->accountFactory->create()->load($customerID, 'customer_id')->getData();
         $resultRedirect->setUrl($this->_redirect->getRefererUrl());
-//check affiliate
-        if($account){
+
+        //check affiliate
+        if($account && $account['code'] == $code){
             return $resultRedirect;
         }
-        $key = $this->scopeConfig->getValue('affiliate/general/url_key',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-        $code = $this->request->getParam($key);
+        //set cookie
         $cookieValue = $code;
         setcookie($key, $cookieValue, time() + (86400 * 365), '/');
         $this->messageManager->addSuccess(__('Refer Link success'));

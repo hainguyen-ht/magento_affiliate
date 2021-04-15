@@ -71,8 +71,6 @@ class Save extends \Magento\Backend\App\Action
                 )->save();
                 if($data['balance'] > 0){
                     $history->addData([
-                        'order_id'              => 1,
-                        'order_increment_id'    => 1,
                         'customer_id'           => $account->load($id)->getData('customer_id'),
                         'is_admin_change'       => 1,
                         'amount'                => $data['balance'],
