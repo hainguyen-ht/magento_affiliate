@@ -56,11 +56,6 @@ class AffiliateOrder implements \Magento\Framework\Event\ObserverInterface
             }
             // Get order total
             $grandTotal = $newOrder['subtotal'];
-            $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/a.log');
-            $logger = new \Zend\Log\Logger();
-            $logger->addWriter($writer);
-            $logger->info($newOrder);
-
 //          check commissiontype
             $per = 0;
             switch ($commissionType){
@@ -89,15 +84,9 @@ class AffiliateOrder implements \Magento\Framework\Event\ObserverInterface
                     'status' => 1
                 ])->save();
             }
-
             //Unset cookie
             unset($_COOKIE[$key]);
             setcookie($key, null, -1, '/');
-
         }
-
-
-        die();
-
     }
 }

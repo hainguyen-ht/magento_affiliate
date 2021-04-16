@@ -25,7 +25,7 @@ class Discount extends \Magento\Quote\Model\Quote\Address\Total\AbstractTotal
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $storeManager;
-
+    protected $amountRefer;
     /**
      * @var \Magento\Framework\Pricing\PriceCurrencyInterface
      */
@@ -91,18 +91,22 @@ class Discount extends \Magento\Quote\Model\Quote\Address\Total\AbstractTotal
         }else {
             $amount = 0;
         }
-        // set title
-        $total->setDiscountDescription('Discount');
         // set amount
         $amount = 0- $amount;
-        if(($total->getData()['subtotal'] + $amount) <= 0){
+//        $amount = 1000;
+        if($total->getData()['subtotal'] <= abs($amount)){
             $amount = 0 - $total->getData()['subtotal'];
         }
 
+//        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/test.log');
+//        $logger = new \Zend\Log\Logger();
+//        $logger->addWriter($writer);
+//        $logger->info($_COOKIE[$key]);
+
         $total->addTotalAmount($this->getCode(), $amount);
+        $this->amountRefer = $amount;
 
         return $this;
-
     }
     /**
      * Add discount total information to address
@@ -113,22 +117,13 @@ class Discount extends \Magento\Quote\Model\Quote\Address\Total\AbstractTotal
      */
     public function fetch(\Magento\Quote\Model\Quote $quote, \Magento\Quote\Model\Quote\Address\Total $total)
     {
-
         // hien thi
-        $result = null;
-        $amount = $total->getDiscountAmount();
-
-        // ONLY return 1 discount. Need to append existing
-        //see app/code/Magento/Quote/Model/Quote/Address.php
-
-        if ($amount != 0) {
-            $description = $total->getDiscountDescription();
-            $result = [
+//        if($this->amountRefer > 0){
+            return $result = [
                 'code' => $this->getCode(),
-                'title' => __($description),
-                'value' => $amount
+                'title' => __('Referral'),
+                'value' => $this->amountRefer
             ];
-        }
-        return $result;
+//        }
     }
 }

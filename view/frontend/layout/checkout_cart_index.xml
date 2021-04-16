@@ -1,10 +1,4 @@
 <?xml version="1.0"?>
-<!--
-/**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
--->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceBlock name="checkout.cart.totals">
@@ -13,13 +7,11 @@
                     <item name="components" xsi:type="array">
                         <item name="block-totals" xsi:type="array">
                             <item name="children" xsi:type="array">
-                                <item name="before_grandtotal" xsi:type="array">
-                                    <item name="children" xsi:type="array">
-                                        <item name="discount" xsi:type="array">
-                                            <item name="config" xsi:type="array">
-                                                <item name="title" xsi:type="string" translate="true">My Discount</item>
-                                            </item>
-                                        </item>
+                                <item name="referral" xsi:type="array">
+                                    <item name="component"  xsi:type="string">Mageplaza_Affiliate/js/view/checkout/summary/customdiscount</item>
+                                    <item name="sortOrder" xsi:type="string">20</item>
+                                    <item name="config" xsi:type="array">
+                                        <item name="referral" xsi:type="string" translate="true">Referral</item>
                                     </item>
                                 </item>
                             </item>
