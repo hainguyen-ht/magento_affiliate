@@ -12,11 +12,13 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
         \Magento\Framework\Data\FormFactory $formFactory,
         \Mageplaza\Affiliate\Model\AccountFactory $accountFactory,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Customer\Model\CustomerFactory $customerFactory,
         array $data = []
     )
     {
         $this->accountFactory = $accountFactory;
         $this->scopeConfig = $scopeConfig;
+        $this->customerFactory = $customerFactory;
         parent::__construct($context, $registry, $formFactory, $data);
     }
 
@@ -27,18 +29,35 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
         $form = $this->_formFactory->create();
         $form->setHtmlIdPrefix('page_');
         $fieldset = $form->addFieldset('base_fieldset', ['legend' => __('Account Infomation')]);
-        $fieldset->addField(
-            'customer_id',
-            $model->getID() ? 'label' : 'text', [
-                'name'     => 'customer_id',
-                'label'    => __('Customer ID'),
-                'title'    => __('customer_id'),
-                'required' => !$model->getID() ? true : false
-            ]
-        );
+        //get name customer
+        if($model->getID()){
+            $customer = $this->customerFactory->create();
+            $customerById = $customer->load($model->getData()['customer_id'])->getData();
+            $cName = $customerById['firstname'] . ' ' .$customerById['lastname'] . ' (' . $customerById['email'] . ')' ;
+        }
 
         if($model->getID())
         {
+            $fieldset->addField(
+                'customer_text',
+                'label', [
+                    'name'     => 'customer',
+                    'label'    => __('Customer ID'),
+                    'title'    => __('customer_id'),
+                    'value'    => $model->getData()['customer_id']
+                ]
+            );
+
+            $fieldset->addField(
+                'customer_id',
+                'hidden', [
+                    'name'     => 'customer_id',
+                    'label'    => __('Customer ID'),
+                    'title'    => __('customer_id'),
+                    'required' => true
+                ]
+            );
+
             $fieldset->addField(
                 'account_id',
                 'hidden',
@@ -49,6 +68,7 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
                     'disabled' => false,
                 ]
             );
+
             $fieldset->addField(
                 'customer_name',
                 'label',
@@ -56,7 +76,7 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
                     'label' => __('Customer Name'),
                     'title' => __('Customer Name'),
                     'name' => 'customer_name',
-                    'value' => 'Brian Tran (brian@mageplaza.com)'
+                    'value' => $cName
                 ]
             );
             $fieldset->addField(
@@ -71,6 +91,15 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
         }
         else
         {
+            $fieldset->addField(
+                'customer_id',
+                'text', [
+                    'name'     => 'customer_id',
+                    'label'    => __('Customer ID'),
+                    'title'    => __('customer_id'),
+                    'required' => true
+                ]
+            );
             $codeLength = $this->scopeConfig->getValue('affiliate/general/code_length',
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 

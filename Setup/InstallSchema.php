@@ -73,17 +73,6 @@ class InstallSchema implements \Magento\Framework\Setup\InstallSchemaInterface
                 )
                 ->setComment(' Ngày tạo account');
             $installer->getConnection()->createTable($table);
-
-//            $installer->getConnection()->addIndex(
-//                $installer->getTable('affiliate_account'),
-//                $setup->getIdxName(
-//                    $installer->getTable('affiliate_account'),
-//                    ['customer_id', 'code', 'balance', 'status'],
-//                    \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_FULLTEXT
-//                ),
-//                ['customer_id', 'code', 'balance', 'status'],
-//                \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_FULLTEXT
-//            );
         }
         if (!$installer->tableExists('affiliate_history')) {
             $table = $installer->getConnection()->newTable(
@@ -168,16 +157,6 @@ class InstallSchema implements \Magento\Framework\Setup\InstallSchemaInterface
                 ->setComment('Lịch sử tạo Account');
             $installer->getConnection()->createTable($table);
 
-//            $installer->getConnection()->addIndex(
-//                $installer->getTable('affiliate_history'),
-//                $setup->getIdxName(
-//                    $installer->getTable('affiliate_history'),
-//                    ['order_id', 'order_increment_id', 'customer_id', 'is_admin_change', 'amount', 'status'],
-//                    \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_FULLTEXT
-//                ),
-//                ['order_id', 'order_increment_id', 'customer_id', 'is_admin_change', 'amount', 'status'],
-//                \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_FULLTEXT
-//            );
         }
         $installer->endSetup();
     }

@@ -4,22 +4,24 @@ namespace Mageplaza\Affiliate\Observer;
 class AffiliateOrder implements \Magento\Framework\Event\ObserverInterface
 {
     public function __construct(
-        \Mageplaza\GiftCard\Model\OrderFactory $orderCollectionFactory,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Framework\View\Result\PageFactory $pageFactory,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Mageplaza\Affiliate\Model\HistoryFactory $historyFactory,
         \Mageplaza\Affiliate\Model\AccountFactory $accountFactory,
-        \Magento\Sales\Model\OrderFactory $orderFactory
+        \Magento\Sales\Model\OrderFactory $orderFactory,
+        \Mageplaza\Affiliate\Helper\Email $helperEmail,
+        \Magento\Checkout\Model\Session $checkoutSession
     )
     {
-        $this->orderCollectionFactory = $orderCollectionFactory;
         $this->customerSession = $customerSession;
         $this->_pageFactory = $pageFactory;
         $this->scopeConfig = $scopeConfig;
         $this->historyFactory = $historyFactory;
         $this->accountFactory = $accountFactory;
         $this->orderFactory = $orderFactory;
+        $this->helperEmail = $helperEmail;
+        $this->checkoutSession= $checkoutSession;
     }
     public function getCustomerID(){
         return $this->customerSession->getCustomer()->getId();
@@ -32,29 +34,36 @@ class AffiliateOrder implements \Magento\Framework\Event\ObserverInterface
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         $key = $this->scopeConfig->getValue('affiliate/general/url_key',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-        if(isset($_COOKIE[$key])){
-            $codeCookie = $_COOKIE[$key];
+        //get code session
+        $codeSession = $this->checkoutSession->getCode();
+        if(isset($codeSession)){
+            $code = $codeSession;
+        }else if(isset($_COOKIE[$key])){
+            $code = $_COOKIE[$key];
+        }
+
+        if($code != null){
             //Create History
             $history = $this->historyFactory->create();
             $account = $this->accountFactory->create();
-            //Get ID aff of customer
-            $affiliateID = $account->load($codeCookie, 'code')->getData('customer_id');
-
-            //Get data Order by customer
+//            //Get ID aff of customer
+            $affiliateID = $account->load($code, 'code')->getData('customer_id');
+//
+//            //Get data Order by customer
             $orders = array();
             foreach ($this->orderFactory->create()->getCollection()->getData() as $item){
                 if($item['customer_id'] == $this->getCustomerID()){
                     $orders[] = $item;
                 }
             }
-            //Get new order
+//            //Get new order
             $newOrder = $orders[0];
             foreach ($orders as $item){
                 if($newOrder['entity_id'] < $item['entity_id']){
                     $newOrder = $item;
                 }
             }
-            // Get order total
+//            // Get order total
             $grandTotal = $newOrder['subtotal'];
 //          check commissiontype
             $per = 0;
@@ -69,11 +78,11 @@ class AffiliateOrder implements \Magento\Framework\Event\ObserverInterface
                     $per = 0;
             }
             //Commisstion Affiliate
-            $account->load($codeCookie, 'code');
+            $account->load($code, 'code');
             $addBalance = $account->addData([
-                'balance' => $account->load($codeCookie, 'code')->getData()['balance'] + $per
+                'balance' => $account->load($code, 'code')->getData()['balance'] + $per
             ])->save();
-            //save History
+//            //save History
             if($addBalance){
                 $history->addData([
                     'order_id' => $newOrder['entity_id'],
@@ -84,9 +93,20 @@ class AffiliateOrder implements \Magento\Framework\Event\ObserverInterface
                     'status' => 1
                 ])->save();
             }
+            $orderID = $observer->getEvent()->getOrder()->getId();
+            //save sales_order
+            $this->orderFactory->create()->load($orderID)->addData([
+                'base_discount_referral_affiliate' => $_COOKIE['amountRefer'] ?? 0,
+                'base_commisstion_referral_affiliate' => $per ?? 0
+            ])->save();
+
             //Unset cookie
             unset($_COOKIE[$key]);
             setcookie($key, null, -1, '/');
+//            sendMail
+            if($per > 0){
+                return $this->helperEmail->sendEmail();
+            }
         }
     }
 }

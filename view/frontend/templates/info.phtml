@@ -1,10 +1,14 @@
 <?php
 /** @var \Mageplaza\Affiliate\Block\Affiliate\Info $block */
+
 echo $block->getLayout()->createBlock(\Magento\Cms\Block\Block::class)->setBlockId('block_identifier')->toHtml(); ?>
 <?php
+if($block->isEnableModule() == 0){
+    return $block->redirect();
+};
+
 $id = $block->getCustomerID();
 $data = $block->getModelAccountAff()->load($id, 'customer_id')->getData();
-
 ?>
 <?php
     if($data){
@@ -25,7 +29,9 @@ $data = $block->getModelAccountAff()->load($id, 'customer_id')->getData();
                     <span><?= $block->escapeHtml(__('Balance')) ?></span>
                 </strong>
                 <div class="box-content">
-                    <?= '$'.$data['balance'] ?>
+                    <?=
+                        $block->formatCurrency($data['balance']);
+                    ?>
                 </div>
             </div>
             <div class="box box-newsletter">
@@ -59,8 +65,8 @@ $data = $block->getModelAccountAff()->load($id, 'customer_id')->getData();
                     <td class="col id"><?= $item['order_id'] ?></td>
                     <td class="col id"><?= $item['order_increment_id'] ?></td>
                     <td class="col id"><?= ($item['is_admin_change'] == 1) ? 'Admin' : 'Customer Order' ?></td>
-                    <td class="col id"><?= $item['amount'] ?></td>
-                    <td class="col id"><?= $item['created_at'] ?></td>
+                    <td class="col id"><?= $block->formatCurrency($item['amount']); ?></td>
+                    <td class="col id"><?= date_format(new DateTime($item['created_at']), "Y/m/d") ?></td>
                 </tr>
                 <?php } ?>
                 </tbody>

@@ -7,36 +7,12 @@ namespace Mageplaza\Affiliate\Model\Quote;
 
 class Discount extends \Magento\Quote\Model\Quote\Address\Total\AbstractTotal
 {
-    /**
-     * Discount calculation object
-     *
-     * @var \Magento\SalesRule\Model\Validator
-     */
     protected $calculator;
-
-    /**
-     * Core event manager proxy
-     *
-     * @var \Magento\Framework\Event\ManagerInterface
-     */
     protected $eventManager = null;
-
-    /**
-     * @var \Magento\Store\Model\StoreManagerInterface
-     */
     protected $storeManager;
     protected $amountRefer;
-    /**
-     * @var \Magento\Framework\Pricing\PriceCurrencyInterface
-     */
     protected $priceCurrency;
 
-    /**
-     * @param \Magento\Framework\Event\ManagerInterface $eventManager
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Magento\SalesRule\Model\Validator $validator
-     * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
-     */
     public function __construct(
         \Magento\Framework\Event\ManagerInterface $eventManager,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
@@ -52,16 +28,6 @@ class Discount extends \Magento\Quote\Model\Quote\Address\Total\AbstractTotal
         $this->scopeConfig = $scopeConfig;
         $this->checkoutSession = $checkoutSession;
     }
-
-    /**
-     * Collect address discount amount
-     *
-     * @param \Magento\Quote\Model\Quote $quote
-     * @param \Magento\Quote\Api\Data\ShippingAssignmentInterface $shippingAssignment
-     * @param \Magento\Quote\Model\Quote\Address\Total $total
-     * @return $this
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     */
     public function collect(
         \Magento\Quote\Model\Quote $quote,
         \Magento\Quote\Api\Data\ShippingAssignmentInterface $shippingAssignment,
@@ -76,8 +42,19 @@ class Discount extends \Magento\Quote\Model\Quote\Address\Total\AbstractTotal
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         $key = $this->scopeConfig->getValue('affiliate/general/url_key',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $codeSession = $this->checkoutSession->getCode();
+        if($codeSession != null){
+            $code = $codeSession;
+        }else if(isset($_COOKIE[$key])){
+            $code = $_COOKIE[$key];
+        }
+//        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/test.log');
+//        $logger = new \Zend\Log\Logger();
+//        $logger->addWriter($writer);
+//        $logger->info($code);
+
         //Check refer
-        if(isset($_COOKIE[$key])){
+        if($code != null){
             switch ($typeApply){
                 case 'fixed':
                     $amount = $discountValue;
@@ -93,23 +70,19 @@ class Discount extends \Magento\Quote\Model\Quote\Address\Total\AbstractTotal
         }
         // set amount
         $amount = 0- $amount;
-//        $amount = 1000;
         if($total->getData()['subtotal'] <= abs($amount)){
             $amount = 0 - $total->getData()['subtotal'];
         }
 
-//        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/test.log');
-//        $logger = new \Zend\Log\Logger();
-//        $logger->addWriter($writer);
-//        $logger->info($_COOKIE[$key]);
-
+        $total->setReferralAmount($amount);
+        $total->setBaseReferralAmount($amount);
         $total->addTotalAmount($this->getCode(), $amount);
-        $this->amountRefer = $amount;
+        $total->addBaseTotalAmount($this->getCode(), $amount);
 
         return $this;
     }
     /**
-     * Add discount total information to address
+     * Add Referral total information to address
      *
      * @param \Magento\Quote\Model\Quote $quote
      * @param \Magento\Quote\Model\Quote\Address\Total $total
@@ -117,13 +90,12 @@ class Discount extends \Magento\Quote\Model\Quote\Address\Total\AbstractTotal
      */
     public function fetch(\Magento\Quote\Model\Quote $quote, \Magento\Quote\Model\Quote\Address\Total $total)
     {
-        // hien thi
-//        if($this->amountRefer > 0){
-            return $result = [
-                'code' => $this->getCode(),
-                'title' => __('Referral'),
-                'value' => $this->amountRefer
-            ];
-//        }
+        $amount = $total->getReferralAmount();
+
+        return $result = [
+            'code' => $this->getCode(),
+            'title' => __('Referral'),
+            'value' => $amount
+        ];
     }
 }

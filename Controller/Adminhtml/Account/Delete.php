@@ -10,10 +10,6 @@ class Delete extends \Magento\Backend\App\Action
         parent::__construct($context);
         $this->accountFactory = $accountFactory;
     }
-//    protected function _isAllowed()
-//    {
-//        return $this->_authorization->isAllowed('Mageplaza_GiftCard::giftcard');
-//    }
 
     /**
      * @return \Magento\Backend\Model\View\Result\Redirect

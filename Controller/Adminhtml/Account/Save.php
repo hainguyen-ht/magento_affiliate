@@ -25,11 +25,15 @@ class Save extends \Magento\Backend\App\Action
         \Magento\Backend\Model\Auth\Session $adminSession,
         \Mageplaza\Affiliate\Model\AccountFactory $accountFactory,
         \Mageplaza\Affiliate\Model\HistoryFactory $historyFactory,
+        \Mageplaza\Affiliate\Helper\Email $helperEmail,
+        \Magento\Customer\Model\CustomerFactory $customerFactory,
         array $data = []
     ) {
         $this->_adminSession = $adminSession;
         $this->accountFactory = $accountFactory;
         $this->historyFactory = $historyFactory;
+        $this->helperEmail = $helperEmail;
+        $this->customerFactory = $customerFactory;
         parent::__construct($context);
     }
 
@@ -52,7 +56,16 @@ class Save extends \Magento\Backend\App\Action
         $userDetail = ["name" => $username, "created_at" => $date];
         $data = array_merge($postObj, $userDetail);
         $resultRedirect = $this->resultRedirectFactory->create();
+        $customer = $this->customerFactory->create();
+
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/test.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $logger->info($postObj);
+
+
         if ($data) {
+            $customerByID = $customer->load($data['customer_id'])->getEntityId();
             $account = $this->accountFactory->create();
             $history = $this->historyFactory->create();
             $id = $postObj['account_id'] ?? null;
@@ -63,7 +76,7 @@ class Save extends \Magento\Backend\App\Action
                     return $resultRedirect->setPath('*/*/');
                 }
 
-                $editAccount = $account->addData(
+                $account->addData(
                     [
                         'status' => $data['status'],
                         'balance'=> $data['balance']
@@ -76,15 +89,30 @@ class Save extends \Magento\Backend\App\Action
                         'amount'                => $data['balance'],
                         'status'                => $data['status']
                     ])->save();
+                    //send Mail
+                    $this->helperEmail->sendEmail();
+
                 }
                 $this->messageManager->addSuccess(__('The data has been saved.'));
                 $this->_adminSession->setFormData(false);
                 if ($this->getRequest()->getParam('back')) {
-                    return $resultRedirect->setPath('giftcard/*/edit', ['id' => $account->getId(), '_current' => true]);
+                    return $resultRedirect->setPath('account/*/edit', ['id' => $account->getId(), '_current' => true]);
                 }
                 return $resultRedirect->setPath('*/*/');
             } else {
+                //check customerID
+                if(!$customerByID){
+                    $this->messageManager->addError(__('ID customer does not exist in the table customer_entity'));
+                    return $resultRedirect->setPath('*/*/');
+                }else if($account->load($data['customer_id'], 'customer_id')->getData()){
+                    $this->messageManager->addWarning(__('This customer is already an affiliate'));
+                    return $resultRedirect->setPath('*/*/');
+                }
                 //CREATE Account
+                if($data['balance'] < 0){
+                    $this->messageManager->addWarning('Validate');
+                    return $resultRedirect->setPath('*/*/');
+                }
                 //auto generate code => code
                 $code = $this->random($postObj['code_length']);
                 $addAccount = $account->addData([
@@ -102,6 +130,8 @@ class Save extends \Magento\Backend\App\Action
                         'amount' => $data['balance'],
                         'status' => $data['status']
                     ])->save();
+                    //send Mail
+                    $this->helperEmail->sendEmail();
                 }
                 $this->messageManager->addSuccess(__('The data has been saved.'));
                 return $resultRedirect->setPath('*/*/');

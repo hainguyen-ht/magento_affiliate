@@ -50,10 +50,10 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
 //        $data[] = $data;
 
 //        $arr = json_encode($arr);
-        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/testc.log');
-        $logger = new \Zend\Log\Logger();
-        $logger->addWriter($writer);
-        $logger->info($arr);
+//        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/testc.log');
+//        $logger = new \Zend\Log\Logger();
+//        $logger->addWriter($writer);
+//        $logger->info($arr);
         return $arr;
     }
 }
